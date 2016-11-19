@@ -9,6 +9,7 @@ int *finalArr;
 
 
 void printArr(int n, unsigned t);
+void foo1(int n, int t);
 
 void finalSort(int size)
 {
@@ -269,76 +270,25 @@ void QuickSortT4(int n) {
 }
 
 void QuickSortT(int n, int t) {
+	vector<std::thread> thrds;
 	int arr_size = n;
 	int s_t, e_t = 0;
 	finalArr = new int[n];
 	cout << "\nQuick sort starts (4 thread)\n";
 	s_t = clock();
 	int k = n / t;
+
 	for (int i = 0; i < t; i++)
 	{
-		thread thr(quickSort, i*k, (i + 1) * k - 1);
+		thrds.push_back(std::thread(quickSort, i*k, (i + 1) * k - 1));
+		printf("Thread %i was started [%i, %i]\n", i, i*k, (i + 1) * k - 1);
 	}
-	thread t1(quickSort, 0, n / 4 - 1);
-	thread t2(quickSort, n / 4, n / 2 - 1);
-	thread t3(quickSort, n / 2, 0.75 * n - 1);
-	thread t4(quickSort, 0.75 * n, n - 1);
-	t1.join();
-	t2.join();
-	t3.join();
-	t4.join();
-
-	int num_lvls = 0; // 2
-	int a = 2;
-	while (a < t)
+	for (int i = 0; i < t; i++)
 	{
-		pow(a, 2);
-		num_lvls++;
+		thrds[i].join();
 	}
 
-	//n = 120
-	//t = 5
-	int num_of_elem = n; // 120
-	int num_of_parts = t / 2; // 2
-	int prev_num_of_parts = t; // 5
-	int prev_size_of_part = n / prev_num_of_parts; // 24
-	int size_of_part = n / num_of_parts; // 40
-	int unproc[2];
-	for (int i = 0; i < num_lvls; i++)
-	{
-		for (int j = 0; j < num_of_parts; j++)
-		{
-			finalSortNew(j * size_of_part, ((j + 1) * size_of_part) - 1);
-			//finalSortNew(j*prev_size_of_part * num_of_parts, ((j + 1) * prev_size_of_part * num_of_parts) - 1);
-		}
-		if (prev_num_of_parts % 2 != 0)
-		{
-			unproc[0] = num_of_parts * size_of_part;
-			unproc[1] = n;
-			finalSortNew(0, unproc[1], unproc[0]);
-		}
-		prev_num_of_parts = num_of_parts;
-		prev_size_of_part = size_of_part;
-		num_of_parts /= 2;
-		size_of_part *= 2;
-	}
-
-	if (t % 2 != 0)
-		finalSortNew(0, n - 1, prev_size_of_part);
-
-	finalSortNew(0, n / 2 - 1);
-	finalSortNew(n / 2, n - 1);
-	finalSortNew(0, n - 1);
-
-
-
-	finalSortNew(0, n / 4 - 1);
-	finalSortNew(n / 4, n / 2 - 1);
-	finalSortNew(n / 2, 3 * n / 4 - 1);
-	finalSortNew(3 * n / 4, n -1);
-	finalSortNew(0, n / 2 - 1);
-	finalSortNew(n / 2, n - 1);
-	finalSortNew(0, n - 1);
+	foo1(n, t);
 
 	e_t = clock() - s_t;
 	cout << "Quick sort (4 threads) time: " << e_t << endl;
@@ -440,7 +390,7 @@ void foo1(int n, int t)
 			{
 				if (j * size_of_part == num_of_elem - unprocessed_int)
 					break;
-				printf("\n%i %i %i", j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
+				finalSortNew(j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
 				unprocessed_int = 0;
 				process_uproc = false;
 				break;
@@ -448,17 +398,17 @@ void foo1(int n, int t)
 			if (num_of_parts == 1)
 			{
 				if (process_uproc)
-					printf("\n%i %i %i", j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
+					finalSortNew(j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
 				else
-					printf("\n%i %i", j * size_of_part, num_of_elem - 1);
+					finalSortNew(j * size_of_part, num_of_elem - 1);
 				break;
 			}
 			if (i == num_of_iter - 1 && j == num_of_parts - 1)
 			{
-				printf("\n%i %i", j * size_of_part, num_of_elem - 1);
+				finalSortNew(j * size_of_part, num_of_elem - 1);
 				break;
 			}
-			printf("\n%i %i", j * size_of_part, (j + 1) * size_of_part - 1);
+			finalSortNew(j * size_of_part, (j + 1) * size_of_part - 1);
 			counter += size_of_part;
 		}
 		prev_num_of_parts = num_of_parts;
@@ -469,7 +419,6 @@ void foo1(int n, int t)
 		size_of_part = prev_size_of_part * 2;
 		if (prev_num_of_parts % 2 != 0)
 		{
-			//size_of_part = (num_of_elem - unprocessed_int) / num_of_parts;
 			num_of_parts++;
 		}
 		counter = 0;
@@ -491,10 +440,18 @@ void BubbleSortTest(int n){
 	cout << arr[n - 1] << endl;
 }
 
-void printArr(int size, unsigned t)
+void printArr(int size, unsigned t = 0)
 {
 	printf("\n");
 	if (t == 0)
+	{
+		printf("Arr: \n");
+		for (int i = 0; i < size; i++)
+		{
+			printf("%i ", arr[i]);
+		}
+	}
+	if (t == 1)
 	{
 		printf("Arr: \n");
 		srand(size);
@@ -503,6 +460,7 @@ void printArr(int size, unsigned t)
 			printf("%i ", arr[rand() % size]);
 		}
 	}
+	printf("\n");
 }
 
 void update_arr(int n)
@@ -522,8 +480,13 @@ int main()
 	cin >> t;
 	arr = new int[n];
 
+	update_arr(n);
+	printArr(n, 0);
+	QuickSortT(n, t);
+	printArr(n, 0);
+
 	//foo(t, n);
-	foo1(n, t);
+	//foo1(n, t);
 
 	/*printf("\n=====");
 	update_arr(n);
