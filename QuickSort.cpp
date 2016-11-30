@@ -3,20 +3,21 @@
 #include <ctime>
 #include <thread>
 
+typedef unsigned long int uli;
+
 using namespace std;
-int *arr;
-int *finalArr;
+uli *arr;
+uli *finalArr;
 
+void printArr(uli size, uli t);
+void foo1(uli n, uli t);
 
-void printArr(int n, unsigned t);
-void foo1(int n, int t);
-
-void finalSort(int size)
+void finalSort(uli size)
 {
-	int first_half_index = 0;
-	int half = size / 2;
-	int second_half_index = size / 2;
-	for (int i = 0; i < size; i++)
+	uli first_half_index = 0;
+	uli half = size / 2;
+	uli second_half_index = size / 2;
+	for (uli i = 0; i < size; i++)
 	{
 		if (arr[first_half_index] < arr[second_half_index])
 		{
@@ -37,32 +38,35 @@ void finalSort(int size)
 		}
 
 		if (first_half_index > half) {
-			for (int j = i; j < size; j++)
+			for (uli j = i; j < size; j++)
 				finalArr[j] = arr[j];
 			break;
 		}
 		if (second_half_index > size) {
-			for (int j = first_half_index; j < half; j++, i++)
+			for (uli j = first_half_index; j < half; j++, i++)
 				finalArr[i] = arr[j];
 			break;
 		}
 	}
 }
 
-void finalSortNew(int l, int r, int s = -1) {
-	int j = 0;
-	int size = r - l + 1;
-	finalArr = new int[size];
-	int first_index = l;
-	int second_index = l + size / 2;
-	int start_second_index = second_index;
+//+
+void finalSortNew(uli l, uli r, uli s = -1) {
+	uli j = 0;
+	uli size = r - l + 1;
+	//finalArr = new uli[size];
+	uli first_index = l;
+	uli second_index = l + size / 2;
+	if (size % 2 != 0)
+		second_index++;
+	uli start_second_index = second_index;
 	if (s != -1)
 	{
 		second_index = s;
 		start_second_index = s;
 	}
 
-	for (int i = first_index; i < first_index + size; i++, j++)
+	for (uli i = first_index; i < first_index + size; i++, j++)
 	{
 		if (arr[first_index] < arr[second_index])
 		{
@@ -92,7 +96,7 @@ void finalSortNew(int l, int r, int s = -1) {
 		{
 			i++;
 			j++;
-			for (int k = i; j < size; k++, j++)
+			for (uli k = i; j < size; k++, j++)
 			{
 				finalArr[j] = arr[k];
 				//printf("\n%i", finalArr[j]);
@@ -104,7 +108,7 @@ void finalSortNew(int l, int r, int s = -1) {
 		{
 			i++;
 			j++;
-			for (int k = first_index; j < size; k++, j++)
+			for (uli k = first_index; j < size; k++, j++)
 			{
 				finalArr[j] = arr[k];
 				//printf("\n%i", finalArr[j]);
@@ -114,7 +118,7 @@ void finalSortNew(int l, int r, int s = -1) {
 	}
 
 	j = l;
-	for (int i = 0; i < size; i++, j++)
+	for (uli i = 0; i < size; i++, j++)
 	{
 		arr[j] = finalArr[i];
 		//printf("\n%i", finalArr[i]);
@@ -124,14 +128,14 @@ void finalSortNew(int l, int r, int s = -1) {
 	//delete[] finalArr;
 }
 
-void finalSortInt(int a, int b, bool first_one = true) //0, 3
+void finalSortInt(uli a, uli b, bool first_one = true) //0, 3
 {
-	int size = b - a + 1; //4
-	int first_half_index = a; //0
-	int half = (a + b) / 2; //2
-	int second_half_index = a + size / 2; //2
+	uli size = b - a + 1; //4
+	uli first_half_index = a; //0
+	uli half = (a + b) / 2; //2
+	uli second_half_index = a + size / 2; //2
 
-	for (int i = a; i < a + size; i++)
+	for (uli i = a; i < a + size; i++)
 	{
 		if (arr[first_half_index] < arr[second_half_index])
 		{
@@ -153,30 +157,30 @@ void finalSortInt(int a, int b, bool first_one = true) //0, 3
 
 		if (first_half_index > half) {
 			i++;
-			for (int j = second_half_index; j < a + size; j++, i++)
+			for (uli j = second_half_index; j < a + size; j++, i++)
 				finalArr[i] = arr[j];
 			break;
 		}
 
 		if (second_half_index > b) {
 			i++;
-			for (int j = first_half_index; j < b; j++, i++)
+			for (uli j = first_half_index; j < b; j++, i++)
 				finalArr[i] = arr[j];
 			break;
 		}
 	}
 
-	//for (int i = a; i < a + size; i++)
+	//for (uli i = a; i < a + size; i++)
 		//arr[i] = finalArr[i];
 }
 
-void bubbleSort(int sz)
+void bubbleSort(uli sz)
 {
-	for (int i = 0; i < sz; i++)
+	for (uli i = 0; i < sz; i++)
 	{
 		// Массив просматривается с конца до
 		// позиции i и "легкие элементы всплывают"
-		for (int j = sz - 1; j > i; j--)
+		for (uli j = sz - 1; j > i; j--)
 		{
 			// Если соседние элементы расположены
 			// в неправильном порядке, то меняем
@@ -189,13 +193,13 @@ void bubbleSort(int sz)
 	}
 }
 
-void quickSort(int l, int r)
+void quickSort(uli l, uli r)
 {
-	int x = arr[l + (r - l) / 2];
+	uli x = arr[l + (r - l) / 2];
 	//запись эквивалентна (l+r)/2, 
 	//но не вызввает переполнения на больших данных
-	int i = l;
-	int j = r;
+	uli i = l;
+	uli j = r;
 	//код в while обычно выносят в процедуру particle
 	while (i <= j)
 	{
@@ -215,40 +219,41 @@ void quickSort(int l, int r)
 		quickSort(l, j);
 }
 
-void QuickSortT1(int n) {
-	int s_t, e_t;
-	finalArr = new int[n];
+void QuickSortT1(uli n) {
+	uli s_t, e_t;
+	finalArr = new uli[n];
 
-	cout << "\nQuick sort starts (1 thread)\n";
+	printf("\nQuick sort starts (%i thread, %i items)\n", 1, n);
 	s_t = clock();
 	quickSort(0, n - 1);
 	e_t = clock() - s_t;
-	cout << "Quick sort time: " << e_t << endl;
+	printf("Quick sort time: %i", e_t);
 }
 
-void QuickSortT2(int n) {
-	int s_t, e_t;
-	finalArr = new int[n];
-	cout << "\nQuick sort starts (2 thread)\n";
+void QuickSortT2(uli n) {
+	uli s_t, e_t;
+	finalArr = new uli[n];
+	printf("\nQuick sort starts (%i thread, %i items)\n", 2, n);
 
 	s_t = clock();
 	thread t1(quickSort, 0, n / 2 - 1);
 	thread t2(quickSort, n / 2, n - 1);
 	t1.join();
 	t2.join();
+	printf("Quick sort time witout final sort: %i\n", clock() - s_t);
 	finalSortNew(0, n - 1);
 	e_t = clock() - s_t;
 
-	cout << "Quick sort (2 threads) time: " << e_t << endl;
+	printf("Quick sort time: %i", e_t);
 
 	delete[] finalArr;
 }
 
-void QuickSortT4(int n) {
-	int arr_size = n;
-	int s_t, e_t = 0;
-	finalArr = new int[n];
-	cout << "\nQuick sort starts (4 thread)\n";
+void QuickSortT4(uli n) {
+	uli arr_size = n;
+	uli s_t, e_t = 0;
+	finalArr = new uli[n];
+	printf("\nQuick sort starts (%i thread, %i items)\n", 4, n);
 	s_t = clock();
 	thread t1(quickSort, 0, n / 4 - 1);
 	thread t2(quickSort, n / 4, n / 2 - 1);
@@ -264,26 +269,47 @@ void QuickSortT4(int n) {
 	finalSortNew(0, n - 1);
 	
 	e_t = clock() - s_t;
-	cout << "Quick sort (4 threads) time: " << e_t << endl;
+	printf("Quick sort time: %i", e_t);
 	delete[] finalArr;
 
 }
 
-void QuickSortT(int n, int t) {
+void QuickSortT(uli n, uli t) {
 	vector<std::thread> thrds;
-	int arr_size = n;
-	int s_t, e_t = 0;
-	finalArr = new int[n];
-	cout << "\nQuick sort starts (4 thread)\n";
+	uli s_t, e_t = 0;
+	finalArr = new uli[n];
+	printf("\nQuick sort starts (%i thread, %i items)\n", t, n);
 	s_t = clock();
-	int k = n / t;
 
-	for (int i = 0; i < t; i++)
+	uli part_size = n / t;
+	uli add_proc = n % t;
+	uli prev_index = 0;
+	uli index = part_size;
+	if (add_proc > 0)
 	{
-		thrds.push_back(std::thread(quickSort, i*k, (i + 1) * k - 1));
-		printf("Thread %i was started [%i, %i]\n", i, i*k, (i + 1) * k - 1);
+		index++;
+		add_proc--;
 	}
-	for (int i = 0; i < t; i++)
+	for (uli i = 0; i < t; i++)
+	{
+		if (i == t - 1)
+		{
+			thrds.push_back(std::thread(quickSort, prev_index, n - 1));
+			//printf("Thread %i  started [%i, %i]\n", i, prev_index, n - 1);
+			break;
+		}
+		thrds.push_back(std::thread(quickSort, prev_index, index - 1));
+		//printf("Thread %i was started [%i, %i]\n", i, prev_index, index - 1);
+		prev_index = index;
+		index += part_size;
+		if (add_proc > 0)
+		{
+			index++;
+			add_proc--;
+		}
+	}
+
+	for (uli i = 0; i < t; i++)
 	{
 		thrds[i].join();
 	}
@@ -291,14 +317,14 @@ void QuickSortT(int n, int t) {
 	foo1(n, t);
 
 	e_t = clock() - s_t;
-	cout << "Quick sort (4 threads) time: " << e_t << endl;
+	printf("Quick sort time: %i", e_t);
 	delete[] finalArr;
 }
 
-void foo(int t, int n)
+void foo(uli t, uli n)
 {
-	int num_lvls = 0; //2
-	int a = 2;
+	uli num_lvls = 0; //2
+	uli a = 2;
 	while (a < t)
 	{
 		a = pow(a, 2);
@@ -307,24 +333,24 @@ void foo(int t, int n)
 
 	//n = 120
 	//t = 5
-	int num_of_elem = n; // 120
-	int prev_num_of_parts = t; // 5
-	int prev_size_of_part[2];
+	uli num_of_elem = n; // 120
+	uli prev_num_of_parts = t; // 5
+	uli prev_size_of_part[2];
 	prev_size_of_part[0] = n / prev_num_of_parts; // 24
 	prev_size_of_part[1] = 0; // 0
-	int num_of_parts = t / 2; // 3
+	uli num_of_parts = t / 2; // 3
 	if (prev_num_of_parts % 2 != 0)
 		num_of_parts++; // 3
-	int size_of_part[2];
+	uli size_of_part[2];
 	size_of_part[0] = prev_size_of_part[0] * 2; //48
 	size_of_part[1] = prev_size_of_part[1]; // 0
 	if (prev_num_of_parts % 2 != 0)
 		size_of_part[1] = prev_size_of_part[0]; // 24
-	int counter = 0;
-	for (int i = 0; i < num_lvls; i++)
+	uli counter = 0;
+	for (uli i = 0; i < num_lvls; i++)
 	{
 		counter = 0;
-		for (int j = 0; j < num_of_parts; j++)
+		for (uli j = 0; j < num_of_parts; j++)
 		{
 			if (j == num_of_parts - 1 && prev_num_of_parts % 2 != 0)
 			{
@@ -354,31 +380,34 @@ void foo(int t, int n)
 
 }
 
-void foo1(int n, int t)
+//+
+void foo1(uli n, uli t)
 {
-	int a = 2;
-	int num_of_iter = 1;
+	uli a = 2;
+	uli num_of_iter = 1;
 	while (a < t)
 	{
 		a *= 2;
 		num_of_iter++;
 	}
-	int num_of_elem = n; 
-	int prev_num_of_parts = t; 
-	int prev_size_of_part = num_of_elem / prev_num_of_parts;
-	int num_of_parts = prev_num_of_parts / 2;
-	int size_of_part = num_of_elem / num_of_parts;
+	uli num_of_elem = n; 
+	uli prev_num_of_parts = t; 
+	uli prev_size_of_part = num_of_elem / prev_num_of_parts;
+	uli num_of_parts = prev_num_of_parts / 2;
+	uli size_of_part = num_of_elem / num_of_parts;
+	
 	if (prev_num_of_parts % 2 != 0)
 	{
 		size_of_part = (num_of_elem - prev_size_of_part) / num_of_parts;
 		num_of_parts++;
 	}
-	int counter = 0;
-	int unprocessed_int = 0;
+	uli counter = 0;
+	uli unprocessed_int = 0;
 	bool process_uproc = false;
-	for (int i = 0; i < num_of_iter; i++)
+
+	for (uli i = 0; i < num_of_iter; i++)
 	{
-		for (int j = 0; j < num_of_parts; j++)
+		for (uli j = 0; j < num_of_parts; j++)
 		{
 			if (prev_num_of_parts % 2 != 0 && j == num_of_parts - 1)
 			{
@@ -391,6 +420,7 @@ void foo1(int n, int t)
 				if (j * size_of_part == num_of_elem - unprocessed_int)
 					break;
 				finalSortNew(j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
+				//printf("\n%i %i %i\n", j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
 				unprocessed_int = 0;
 				process_uproc = false;
 				break;
@@ -398,17 +428,25 @@ void foo1(int n, int t)
 			if (num_of_parts == 1)
 			{
 				if (process_uproc)
+				{
 					finalSortNew(j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
+ 					//printf("\n%i %i %i\n", j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
+				}
 				else
+				{
 					finalSortNew(j * size_of_part, num_of_elem - 1);
+					//printf("\n%i %i\n", j * size_of_part, num_of_elem - 1);
+				}
 				break;
 			}
 			if (i == num_of_iter - 1 && j == num_of_parts - 1)
 			{
 				finalSortNew(j * size_of_part, num_of_elem - 1);
+				//printf("\n%i %i\n", j * size_of_part, num_of_elem - 1);
 				break;
 			}
 			finalSortNew(j * size_of_part, (j + 1) * size_of_part - 1);
+			//printf("\n%i %i\n", j * size_of_part, (j + 1) * size_of_part - 1);
 			counter += size_of_part;
 		}
 		prev_num_of_parts = num_of_parts;
@@ -425,214 +463,85 @@ void foo1(int n, int t)
 	}
 }
 
-void BubbleSortTest(int n){
-	int s_t, e_t;
-	for (int i = 0; i < n; i++)
-	{
-		arr[i] = rand() % 1000;
-	}
+void BubbleSortTest(uli n){
+	uli s_t, e_t;
+	
 	cout << "Bubble sort starts\n";
 	s_t = clock();
 	bubbleSort(n);
 	e_t = clock() - s_t;
 	cout << "Buuble sort time: " << e_t << endl;
-	cout << arr[0] << " ";
-	cout << arr[n - 1] << endl;
 }
 
-void printArr(int size, unsigned t = 0)
+//+
+void printArr(uli size, uli t)
 {
 	printf("\n");
 	if (t == 0)
 	{
 		printf("Arr: \n");
-		for (int i = 0; i < size; i++)
+		srand(size*size);
+		for (uli i = 0; i < 9; i++)
 		{
-			printf("%i ", arr[i]);
+			printf("%i ", arr[rand() % size]);
 		}
+		printf("%i ", arr[size - 1]);
 	}
 	if (t == 1)
 	{
 		printf("Arr: \n");
-		srand(size);
-		for (int i = 0; i < 10; i++)
+		for (uli i = 0; i < size; i++)
 		{
-			printf("%i ", arr[rand() % size]);
+			printf("%i ", arr[i]);
 		}
 	}
 	printf("\n");
 }
 
-void update_arr(int n)
+void update_arr(uli n)
 {
 	srand(n);
-	for (int i = 0; i < n; i++)
+	for (uli i = 0; i < n; i++)
 	{
 		arr[i] = rand() % 11;
 	}
 }
 
-int main()
+uli main()
 {
-	int n;//количество элементов в массиве
-	int t;
+	uli n;//количество элементов в массиве
+	uli t;
 	cin >> n;
 	cin >> t;
-	arr = new int[n];
+	arr = new uli[n];
 
-	update_arr(n);
-	printArr(n, 0);
-	QuickSortT(n, t);
-	printArr(n, 0);
-
-	//foo(t, n);
-	//foo1(n, t);
-
-	/*printf("\n=====");
-	update_arr(n);
-	printArr(n, 0);
-	QuickSortT1(n);
-	printArr(n, 0);
+	//printf("\n=====");
+	//update_arr(n);
+	////printArr(n, 0);
+	//QuickSortT1(n);
+	////printArr(n, 0);
 
 	printf("\n=====");
 	update_arr(n);
-	printArr(n, 0);
+	//printArr(n, 0);
 	QuickSortT2(n);
-	printArr(n, 0);
+	//printArr(n, 0);
 
 	printf("\n=====");
 	update_arr(n);
-	printArr(n, 0);
+	//printArr(n, 0);
 	QuickSortT4(n);
-	printArr(n, 0);*/
+	//printArr(n, 0);
 
-	//delete[] arr;
+	////for (uli i = t; i < t + 10; i++)
+	//	printf("\n=====");
+	//	update_arr(n);
+	//	printArr(n, 0);
+	//	QuickSortT(n, t);
+	//	printArr(n, 0);
+
+	delete[] arr;
 	printf("\n");
 	system("pause");
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//#include <iostream>
-//#include <stdio.h>
-//#include <fstream>
-//#include <conio.h>
-//#include <thread>
-//#include <time.h>
-//#include <random>
-//#include <Windows.h>
-//#include <vector>
-//
-//typedef unsigned int ui;
-//using namespace std;
-//
-////template <typename T>
-//
-//void quick_sort(ui* arr, ui l, ui r)
-//{
-//
-//	ui i = l;
-//	ui j = r;
-//	ui m = (l + r) / 2;
-//	ui middle = arr[(i + j) / 2];
-//
-//	do
-//	{
-//		while (middle > arr[i]) i++;
-//		while (middle < arr[j]) j--;
-//
-//		if (i <= j)
-//		{
-//			swap(arr[i], arr[j]);
-//			i++;
-//			j--;
-//		}
-//
-//	} while (i < j);
-//	/*
-//
-//	if(i < r) function1(arr,i,r);
-//	if(j > l) function1(arr,l,j);
-//
-//	*/
-//
-//
-//}
-//
-//void foo(ui* arr, ui l, ui r)
-//{
-//	cout << l << endl;
-//}
-//
-//int main()
-//{
-//	setlocale(LC_ALL, "Russian");
-//	srand(time(NULL));
-//	cout << "***DEBUG MOD***" << endl;
-//	cout << "* Загрузка завершена " << endl /*<< "* Ожидание ввода" << endl*/;
-//	/*
-//	cout << " Введите размер массива " << endl;
-//	ui N;
-//	cin >> N;
-//	cout << " Введите кол-во потоков (или ядер) " << endl;
-//	short y;
-//	cin >> y;
-//	*/
-//	short N = 6;
-//
-//	ui Long = 12000000;
-//	ui *arr = new ui[Long];
-//
-//
-//
-//	for (ui i = 0; i < Long; i++)
-//	{
-//		arr[i] = rand();
-//	}
-//
-//
-//	vector <thread> threads;
-//	//for (ui i = 1; i < Long; ++i)
-//	//{
-//	//	threads.push_back(thread(quick_sort, arr, 0, 12000000));
-//	//}
-//
-//	//std::thread t(quick_sort, arr, 2, 4);
-//
-//	for (ui i = 1; i < Long; ++i)
-//	{
-//		threads.push_back(thread(quick_sort, arr, 0, 12000000));
-//	}
-//
-//	for (int i = 0; i < N; i++)
-//
-//
-//		cout << endl << "Поток " << "Основной: " << " Завершено" << endl;
-//	Sleep(1000);
-//	return 0;
-//}
