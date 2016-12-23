@@ -5,12 +5,12 @@
 #include <fstream>
 
 using namespace std;
-int *arr;
-int *finalArr;
+int *arr; // исходнй массив данных
+int *tempArr; // Вспомогательный массив
 ofstream fout("InfoCPP.log");
 
 
-void updateArr(int n, int typeOfUpdate) // typeOfUpdate: 0 - Random, 1 - Increase, 2 - Decrease
+void updateArr(int n, int typeOfUpdate) // n - количевстов элементов, typeOfUpdate: 0 - Random, 1 - Возрастаюшая, 2 - Убывающая последовательность
 {
 	if (typeOfUpdate == 0)
 	{
@@ -37,7 +37,7 @@ void updateArr(int n, int typeOfUpdate) // typeOfUpdate: 0 - Random, 1 - Increas
 	}
 }
 
-void printArr(int size, int t)
+void printArr(int size, int t = 1) // Вывод на экран массива данных
 {
 	printf("\n");
 	if (t == 0)
@@ -61,14 +61,13 @@ void printArr(int size, int t)
 	printf("\n");
 }
 
-void quickSort(int l, int r)
+void quickSort(int l, int r) // Алгоритм Быстрой сортировки
 {
-	//запись эквивалентна (l+r)/2, но не вызввает переполнения на больших данных
-	int x = arr[l + (r - l) / 2];
-	int i = l;
+	int x = arr[l + (r - l) / 2]; // Определение опорного элемента
+	int i = l; 
 	int j = r;
 	int temp = 0;
-	
+
 	while (i <= j)
 	{
 		while (arr[i] < x) i++;
@@ -83,80 +82,278 @@ void quickSort(int l, int r)
 		}
 	}
 	if (i<r)
-		quickSort(i, r);
+		quickSort(i, r); 
 
 	if (l<j)
 		quickSort(l, j);
 }
 
-void finalSort(int l, int r, int s = -1) {
-	int j = 0;
+void newFinalSort(int l, int r, int s = -1)
+{
 	int size = r - l + 1;
+	int firstIndex = l;
+	int secondIndex = l + size / 2;
+	if (size % 2 != 0)
+		secondIndex++;
+	int center = secondIndex;
+	if (s != -1)
+	{
+		center = s;
+		secondIndex = center;
+	}
+	int index = 0;
+	while ( firstIndex < center && secondIndex < l + size )
+	{
+		if (arr[firstIndex] <= arr[secondIndex])
+		{
+			tempArr[index] = arr[firstIndex];
+			firstIndex++;
+		}
+		else
+		{
+			tempArr[index] = arr[secondIndex];
+			secondIndex++;
+		}
+		index++;
+	}
+	if (firstIndex < center)
+	{
+		for (int i = index; i < size; i++)
+		{
+			tempArr[i] = arr[firstIndex];
+			firstIndex++;
+		}
+	}
+	else
+	{
+		for (int i = index; i < size; i++)
+		{
+			tempArr[i] = arr[secondIndex];
+			secondIndex++;
+		}
+	}
+
+	int j = l;
+	for (int i = 0; i < size; i++, j++) // Копируем значения из временного массива в исходный
+	{
+		arr[j] = tempArr[i];
+	}
+
+	printf("%i, %i, %i\n", l, r, s);
+
+}
+
+void finalSort(int l, int r, int s = -1) // Функция объединения двух отсортированных участков
+{
+	int size = r - l + 1; //Размер участка
 	int first_index = l;
-	int second_index = l + size / 2;
+	int second_index = l + size / 2; // Индекс второй сортированной половины
 	if (size % 2 != 0)
 		second_index++;
 	int start_second_index = second_index;
-	if (s != -1)
+	if (s != -1)   
 	{
 		second_index = s;
 		start_second_index = s;
 	}
 
-	for (int i = first_index; i < first_index + size; i++, j++)
+	unsigned int index = 0;
+
+	for (int i = first_index; i < first_index + size; i++, index++)
 	{
-		if (arr[first_index] < arr[second_index])
+		if (arr[first_index] < arr[second_index]) // Если элемент из первой половины меньше, чем из второй, то заносим его первым. Увеличиваем first_index, чтобы сравнивть следующий элемент
 		{
-			finalArr[j] = arr[first_index];
+			tempArr[index] = arr[first_index];
 			first_index++;
-		} 
+		}
 		else if (arr[second_index] < arr[first_index])
 		{
-			finalArr[j] = arr[second_index];
+			tempArr[index] = arr[second_index];
 			second_index++;
 		}
 		else
 		{
-			finalArr[j] = arr[first_index];
+			tempArr[index] = arr[first_index];
 			first_index++;
-			j++;
+			index++;
 			i++;
-			finalArr[j] = arr[second_index];
+			tempArr[index] = arr[second_index];
 			second_index++;
 		}
 
-		if (first_index >= start_second_index)
+		if (first_index >= start_second_index) // Если проверили все элементы первой половины, то оставшиеся из второй записываем без изменения их порядка, они уже отсортированы
 		{
 			i++;
-			j++;
-			for (int k = i; j < size; k++, j++)
+			index++;
+			for (int k = i; index < size; k++, index++)
 			{
-				finalArr[j] = arr[k];
+				tempArr[index] = arr[k];
 			}
 			break;
 		}
 
-		if (second_index > r)
+		if (second_index > r) // Аналогично предыдущему действию, только для первой половины
 		{
 			i++;
-			j++;
-			for (int k = first_index; j < size; k++, j++)
+			index++;
+			for (int k = first_index; index < size; k++, index++)
 			{
-				finalArr[j] = arr[k];
+				tempArr[index] = arr[k];
 			}
 			break;
 		}
 	}
 
-	j = l;
-	for (int i = 0; i < size; i++, j++)
+	int j = l;
+	for (int i = 0; i < r - l; i++, j++) // Копируем значения из временного массива в исходный
 	{
-		arr[j] = finalArr[i];
+		arr[j] = tempArr[i];
 	}
-	
+
 }
 
-void separateFinalSort(int n, int t)
+void merger(int numOfItems, int numOfThr)
+{
+	int numOfParts = numOfThr;
+	int *sizeOfParts = new int[numOfParts];
+	int index = 0;
+	int *indexes = new int[numOfParts];
+	int sizeOfPart = numOfItems / numOfThr;
+	int addProc = numOfItems % numOfThr;
+	int total_size = 0;
+	for (int i = 0; i < numOfParts; i++)
+	{
+		if (addProc > 0)
+		{
+			indexes[i] = total_size;
+			sizeOfParts[i] = sizeOfPart + 1;
+			total_size += sizeOfParts[i];
+			addProc--;
+			continue;
+		}
+		indexes[i] = total_size;
+		sizeOfParts[i] = sizeOfPart;
+		total_size += sizeOfParts[i];
+	}
+
+	int prevMin = arr[0];
+	int min = arr[0];
+	int numMin = min;
+	while (index != numOfItems)
+	{
+		int sumOfPrevIndex = 0;
+		printf("%i\n", clock());
+		for (int i = 0; i < numOfParts; i++)
+		{
+			sumOfPrevIndex += sizeOfParts[i];
+			if (indexes[i] < sumOfPrevIndex)
+			{
+				min = arr[indexes[i]];
+				numMin = i;
+				break;
+			}
+		}
+		printf("%i\n", clock());
+		sumOfPrevIndex = 0;
+		for (int i = 0; i < numOfParts; i++)
+		{
+			sumOfPrevIndex += sizeOfParts[i];
+			if (indexes[i] < sumOfPrevIndex)
+			{
+				if (min > arr[indexes[i]])
+				{
+					prevMin = min;
+					min = arr[indexes[i]];
+					numMin = i;
+				}
+			}
+		}
+		tempArr[index] = min;
+		index++;
+		indexes[numMin]++;
+		prevMin = min;
+	}
+
+	for (int i = 0; i < numOfItems; i++)
+		arr[i] = tempArr[i];
+
+	delete[] indexes;
+	delete[] sizeOfParts;
+
+}
+
+void newFS(int numOfItems, int numOfThr)
+{
+	int a = 2;
+	int numOfLevels = 1;
+	while (a < numOfThr)
+	{
+		a *= 2;
+		numOfLevels++;
+	}
+
+	int numOfUnprocessed = 0;
+	int numOfItemsForProc = numOfItems;
+	int processedOnCurrentLvl = 0;
+	int prevNumOfParts = numOfThr; // 11
+	int currentNumOfParts = prevNumOfParts / 2; // 5
+	if (prevNumOfParts % 2 != 0)
+		currentNumOfParts++;
+	int sizeOfPart = numOfItems / prevNumOfParts; // 22
+	int sizeOfCurrentPart = sizeOfPart; // Размер текущей части
+	int addProc = numOfItems % prevNumOfParts; // Дополнительные элементы, которые необходимо обработать
+	
+
+	for (int i = 0; i < numOfLevels; i++)
+	{
+		int x1 = -1, x2 = -1, x = -1;
+		int separaters = 0;
+		for (int j = 0; j < numOfItems; j++)
+		{
+			if (j == 0)
+			{
+				x1 = 0;
+				j += sizeOfPart - 1;
+			}
+			if (arr[j - 1] > arr[j])
+			{
+				separaters++;
+				if (separaters % 2 != 0)
+				{
+					x = j;
+					j += sizeOfPart - 1;
+				}
+				if (separaters % 2 == 0)
+				{
+					x2 = j;
+					newFinalSort(x1, x2 - 1, x);
+					x1 = x2;
+					j += sizeOfPart - 1;
+				}
+			}
+			if (j >= numOfItems - 1)
+			{
+				if (separaters % 2 != 0)
+				{
+					x2 = numOfItems;
+					newFinalSort(x1, x2 - 1, x);
+					if (x1 == 0 && x2 == numOfItems)
+						return;
+					j += sizeOfPart - 1;
+					continue;
+				}
+				else
+				{
+					numOfUnprocessed = numOfItems - x2;
+				}
+			}
+		}
+		sizeOfPart *= 2;
+	}
+
+}
+
+void startFinalSort(int n, int t) // Функция для упарвления объединением множества результатов сортировок в один
 {
 	int a = 2;
 	int num_of_iter = 1;
@@ -165,12 +362,12 @@ void separateFinalSort(int n, int t)
 		a *= 2;
 		num_of_iter++;
 	}
-	int num_of_elem = n; 
-	int prev_num_of_parts = t; 
-	int prev_size_of_part = num_of_elem / prev_num_of_parts;
-	int num_of_parts = prev_num_of_parts / 2;
+	int num_of_elem = n;
+	int prev_num_of_parts = t; // Количество отсортированных участков на самом нижнем уровне
+	int prev_size_of_part = num_of_elem / prev_num_of_parts; // Размер отсортированных областей
+	int num_of_parts = prev_num_of_parts / 2; 
 	int size_of_part = num_of_elem / num_of_parts;
-	
+
 	if (prev_num_of_parts % 2 != 0)
 	{
 		size_of_part = (num_of_elem - prev_size_of_part) / num_of_parts;
@@ -194,8 +391,7 @@ void separateFinalSort(int n, int t)
 			{
 				if (j * size_of_part == num_of_elem - unprocessed_int)
 					break;
-				finalSort(j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
-				//printf("\n%i %i %i\n", j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
+				newFinalSort(j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
 				unprocessed_int = 0;
 				process_uproc = false;
 				break;
@@ -204,24 +400,20 @@ void separateFinalSort(int n, int t)
 			{
 				if (process_uproc)
 				{
-					finalSort(j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
- 					//printf("\n%i %i %i\n", j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
+					newFinalSort(j * size_of_part, num_of_elem - 1, num_of_elem - unprocessed_int);
 				}
 				else
 				{
-					finalSort(j * size_of_part, num_of_elem - 1);
-					//printf("\n%i %i\n", j * size_of_part, num_of_elem - 1);
+					newFinalSort(j * size_of_part, num_of_elem - 1);
 				}
 				break;
 			}
 			if (i == num_of_iter - 1 && j == num_of_parts - 1)
 			{
-				finalSort(j * size_of_part, num_of_elem - 1);
-				//printf("\n%i %i\n", j * size_of_part, num_of_elem - 1);
+				newFinalSort(j * size_of_part, num_of_elem - 1);
 				break;
 			}
-			finalSort(j * size_of_part, (j + 1) * size_of_part - 1);
-			//printf("\n%i %i\n", j * size_of_part, (j + 1) * size_of_part - 1);
+			newFinalSort(j * size_of_part, (j + 1) * size_of_part - 1);
 			counter += size_of_part;
 		}
 		prev_num_of_parts = num_of_parts;
@@ -238,9 +430,10 @@ void separateFinalSort(int n, int t)
 	}
 }
 
-int quickSortT(int n, int t) {
-	int s_t, e_t = 0;
-	if (t < 2)
+int parallelQuickSort(int n, int t) // Функция многопотоковой сортировки
+{
+	int s_t, e_t = 0; // Переменные для измерения времени выполнения
+	if (t == 1) // Если поток только один
 	{
 		fout << "Quick sort starts (" << t << " threads, " << n << " items)" << endl;
 		printf("Quick sort starts (%i threads, %i items)\n", t, n);
@@ -253,16 +446,16 @@ int quickSortT(int n, int t) {
 	}
 
 	vector<std::thread> thrds(t);
-	finalArr = new int[n];
+	tempArr = new int[n];
 	fout << "Quick sort starts (" << t << " threads, " << n << " items)" << endl;
 	printf("Quick sort starts (%i threads, %i items)\n", t, n);
 	s_t = clock();
 
-	int part_size = n / t;
-	int add_proc = n % t;
+	int part_size = n / t; // Размер области для выполнения
+	int add_proc = n % t; // Дополнительные элементы, которые необходимо обработать
 	int prev_index = 0;
 	int index = part_size;
-	if (add_proc > 0)
+	if (add_proc > 0) // Добавление еще одного элемента к интервалу для равномерно распределения задачи
 	{
 		index++;
 		add_proc--;
@@ -287,81 +480,66 @@ int quickSortT(int n, int t) {
 		}
 	}
 
-	for (int i = 0; i < thrds.size(); i++)
+	for (int i = 0; i < thrds.size(); i++) // Создание и заупск потоков
 	{
 		if (thrds[i].joinable())
 			thrds[i].join();
 	}
-	
-	separateFinalSort(n, t);
+
+	thrds.clear();
+
+	//startFinalSort(n, t);
+	printArr(n);
+
+	//merger(n, t);
+	newFS(n, t);
+	//newFinalSort(0, 11);
+	//finalSort(0, 12, 7);
 
 	e_t = clock() - s_t;
 	fout << "Quick sort time: " << e_t << endl;
 	printf("Quick sort time: %i\n", e_t);
-	delete[] finalArr;
+	delete[] tempArr;
+	tempArr = NULL;
 	return e_t;
 }
 
-void startTest(int numOfI)
+void startTest(int numOfItems, int numOfThreads, int numOfTests) // Функция тестирования
 {
-	const int numOfTests = 5;
-	const int numOfTestThreads = 5;
-	int timeArr[numOfTestThreads];
-	for (int i = 0; i < numOfTestThreads; i++)
-		timeArr[i] = 0;
-	int numOfItems = numOfI;
-	for (int j = 0; j < 3; j++)
+	int typeOfArr = 0; // 0 - Random, 1 - Возрастаюшая, 2 - Убывающая последовательность
+	int totalTime = 0; 
+
+	arr = new int[numOfItems]; // Выделение памяти для массива данных
+
+	for (int i = 0; i < numOfTests; i++)
 	{
-		for (int i = 0; i < numOfTests; i++)
-		{ 
-			fout << "Test #" << i + 1 << " (Type of Arr : " << j << ")" << endl;
-			printf("Test #%i (Type of Arr: %i)\n", i + 1, j);
-			updateArr(numOfItems, j);
-			timeArr[0] += quickSortT(numOfItems, 1);
-
-			updateArr(numOfItems, j);
-			timeArr[1] += quickSortT(numOfItems, 2);
-
-			updateArr(numOfItems, j);
-			timeArr[2] += quickSortT(numOfItems, 4);
-
-			updateArr(numOfItems, j);
-			timeArr[3] += quickSortT(numOfItems, 8);
-
-			updateArr(numOfItems, j);
-			timeArr[4] += quickSortT(numOfItems, 16);
-		}
-		fout << "Time for 1 thread: "<< timeArr[0] << endl;
-		printf("Time for 1 thread: %i\n", timeArr[0]);
-		fout << "Time for 2 thread: " << timeArr[1] << endl;
-		printf("Time for 2 thread: %i\n", timeArr[1]);
-		fout << "Time for 4 thread: " << timeArr[2] << endl;
-		printf("Time for 4 thread: %i\n", timeArr[2]);
-		fout << "Time for 8 thread: " << timeArr[3] << endl;
-		printf("Time for 8 thread: %i\n", timeArr[3]);
-		fout << "Time for 16 thread: " << timeArr[4] << endl;
-		printf("Time for 16 thread: %i\n", timeArr[4]);
+		updateArr(numOfItems, typeOfArr);
+		printArr(numOfItems);
+		fout << "Test #" << i + 1 << " (Type of Arr : " << typeOfArr << ")" << endl;
+		printf("Test #%i (Type of Arr: %i)\n", i + 1, typeOfArr);
+		totalTime += parallelQuickSort(numOfItems, numOfThreads);
 	}
+
+	fout << "Total time for " << numOfThreads << " threads: " << totalTime << endl << "=============" << endl;
+	printf("Total time for %i threads: %i\n=============\n", numOfThreads ,totalTime);
+	printArr(numOfItems);
+	delete[] arr;
+	arr = NULL;
 }
+
+
 
 int main()
 {
-	const int numOfTestItems = 5;
-	int arrOfTestItems[numOfTestItems];
-	arrOfTestItems[0] = 100;
-	arrOfTestItems[1] = 5000;
-	arrOfTestItems[2] = 100000;
-	arrOfTestItems[3] = 5000000;
-	arrOfTestItems[4] = 100000000;
-
-	fout << "Max hardware threads: " << thread::hardware_concurrency() << endl;
-
-	for (int i = 0; i < numOfTestItems; i++)
-	{
-		arr = new int[arrOfTestItems[i]];
-		startTest(arrOfTestItems[i]);
-		delete[] arr;
-	}
+	// Проведение тестирования
+	startTest(25, 3, 1);
+	/*startTest(100000000, 2, 1);
+	startTest(100000000, 4, 1);
+	startTest(100000000, 8, 1);
+	startTest(100000000, 16, 1);
+	startTest(100000000, 100, 1);
+	startTest(100000000, 1000, 1);*/
+	//startTest(1000000, 500, 1);
 
 	printf("Test successfully completed\n");
 	system("pause");
